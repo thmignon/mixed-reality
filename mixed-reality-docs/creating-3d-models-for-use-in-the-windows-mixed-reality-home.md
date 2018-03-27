@@ -14,8 +14,35 @@ keywords: 3D, modeling, modeling guidance, asset requirements, authoring guideli
 
 The [Windows Mixed Reality home](navigating-the-windows-mixed-reality-home.md) is the starting point where users land before launching applications. You can design your application for Windows Mixed Reality **immersive headsets** to leverage a [3D model as an app launcher](implementing-3d-app-launchers.md) and to allow [3D deep links to be placed into the Windows Mixed Reality home from within your app](implementing-3d-deep-links-for-your-app-in-the-windows-mixed-reality-home.md). This article outlines the guidelines for creating 3D models compatible with the Windows Mixed Reality home.
 
->[!NOTE]
->3D models in the Windows Mixed Reality home are not currently available for use on HoloLens.
+## Overview
+
+Windows Mixed Reality relies on glTF (.glb) as the asset delivery format for 3D launchers and user generated content. glTF is a royalty free open standard for 3D asset delivery maintained by the Khronos group. As glTF evolves as an industry standard for interoperable 3D content so will Microsoft’s support for the format across Windows apps and experiences. There are a number of requirements that you should keep in mind when creating your 3D models for Windows Mixed Reality. 
+
+### Requirements
+The following 
+
+If your application will only be shipping to users with OS versions greater than or euqal to the 2018 Spring Creators update (1803) then additional optimizations on top of the glTF format are otpional, however still highly reccommended. 
+1. Assets must be less than 10k triangles
+2. Textures larger than 4k are not supported
+3. 
+| Feature  |   PC OS Version | HoloLens OS Version | 
+|------|------|------|
+| Placing 3D assets and creating 3D launchers |  Windows Version 1709 and greater | Windows Version 1803 and greater|
+| Core glTF 2.0 support (unoptimized) | Windows Version 1803 and greater | Windows Version 1803 and greater | 
+
+### Creating glTF models
+
+The first step in exporting assets for Windows Mixed Reality endpoints is generating a glTF 2.0 model. The glTF working group maintains a [list of supported exporters and converters](https://github.com/KhronosGroup/glTF/blob/master/README.md#converters-and-exporters) to create a glTF 2.0 model. To get started use one of the programs listed on this page to create and export a glTF 2.0 model, or convert an existing model using one of the supported converters.
+
+
+
+### Optimizing glTF Models for the Mixed Reality Home
+
+The Windows Mixed Reality home requires a number of optimizations to be performed on the glTF before adding it to your project (see required] and optional optimizations below). To make this process easier we have created the Windows Mixed Reality Asset Converter which is [available on Github](https://github.com/Microsoft/glTF-Toolkit/releases). This tool uses a set of utilities available in the Microsoft glTF toolkit to convert any standard 2.0 glTF or .glb into a Windows Mixed Reality compatible .glb. This is currently a required step for all assets used in Windows Mixed Reality, and we highly recommend using the converter to make generating your mixed reality home assets easy. For more information about using the tool please refer to the documentation also [available on GitHub](https://github.com/Microsoft/glTF-Toolkit/blob/master/WindowsMRAssetConverter/README.md).
+
+### Binary glTF format
+
+The [binary glTF format](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification) packages the glTF file into a single binary package. Windows Mixed Reality Home expects assets to be delivered using the binary glTF format with embedded images and binary data. Assets packed using the binary glTF format use the .glb file extension. Standard glTF models are not supported.
 
 ## Modeling guidelines
 
@@ -70,22 +97,6 @@ Value scale map depicting areas of occluded light which blocks reflections
 
 Tells the shader if something is metal or not. Raw Metal = 1.0 white Non metal = 0.0 black. There can be transitional gray values that indicate something covering the raw metal such as dirt, but in general this map should be black and white only.
 
-## Exporting assets
-
-Windows Mixed Reality relies on glTF (.glb) as the asset delivery format for 3D launchers and content. glTF is a royalty free open standard for 3D asset delivery maintained by the Khronos group. As glTF evolves as an industry standard for interoperable 3D content so will Microsoft’s support for the format across Windows apps and experiences.
-
-### Creating glTF models
-
-The first step in exporting assets for Windows Mixed Reality endpoints is generating a glTF 2.0 model. The glTF working group maintains a [list of supported exporters and converters](https://github.com/KhronosGroup/glTF/blob/master/README.md#converters-and-exporters) to create a glTF 2.0 model. To get started use one of the programs listed on this page to create and export a glTF 2.0 model, or convert an existing model using one of the supported converters.
-
-### Converting glTF Models for the Mixed Reality Home
-
-The Windows Mixed Reality home requires a number of optimizations to be performed on the glTF before adding it to your project (see required] and optional optimizations below). To make this process easier we have created the Windows Mixed Reality Asset Converter which is [available on Github](https://github.com/Microsoft/glTF-Toolkit/releases). This tool uses a set of utilities available in the Microsoft glTF toolkit to convert any standard 2.0 glTF or .glb into a Windows Mixed Reality compatible .glb. This is currently a required step for all assets used in Windows Mixed Reality, and we highly recommend using the converter to make generating your mixed reality home assets easy. For more information about using the tool please refer to the documentation also [available on GitHub](https://github.com/Microsoft/glTF-Toolkit/blob/master/WindowsMRAssetConverter/README.md).
-
-### Binary glTF format
-
-The [binary glTF format](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification) packages the glTF file into a single binary package. Windows Mixed Reality Home expects assets to be delivered using the binary glTF format with embedded images and binary data. Assets packed using the binary glTF format use the .glb file extension. Standard glTF models are not supported.
-
 ### glTF Implementation notes
 
 The glTF asset MUST point to the default scene using the scene attribute to be rendered by Windows MR. Additionally the Windows MR glTF loader **requires** accessors:
@@ -108,9 +119,9 @@ The following material properties are ignored from core spec:
 * occlusionTexture: Must instead use Microsoft optimized texture packing defined below
 * occlusionStrength
 
-## Required Optimizations
+## Optimizatizing Models
 
-Windows Mixed Reality home **requires** a series of optimizations on top of the core glTF spec. These are defined using custom extensions. The following packing formats and extensions are required otherwise the model won’t render successfully. You can easily convert any 2.0 glTF model to meet these required specifications using the [Windows Mixed Reality Asset Converter available on GitHub](https://github.com/Microsoft/glTF-Toolkit/releases). This tool will perform the correct texture packing and optimizations outlined below.
+Windows Mixed Reality home offers a set of optimizations on top of the core glTF spec. You can easily optimize any 2.0 glTF model for Windows Mixed Reality using the [Windows Mixed Reality Asset Converter available on GitHub](https://github.com/Microsoft/glTF-Toolkit/releases). This tool will perform the correct texture packing and optimizations outlined below. These **optimizations are required on Windows version 1709** and optional on versions greater than or equal to 1803. If your app is shipping on older versions of Windows make sure to read through this section thoroughly. 
 
 ### Materials
 
@@ -159,12 +170,14 @@ LODs are displayed in Windows Mixed Reality based on a system driven by the scre
 |  LOD 4  |  Under 1%  |  - | 
 
 ## Additional resources
+* [glTF Exporters](https://github.com/KhronosGroup/glTF#converters-and-exporters)
 * [glTF Toolkit](https://github.com/Microsoft/glTF-Toolkit)
 * [glTF 2.0 Specification](https://github.com/KhronosGroup/glTF/blob/master/README.md)
-* [Microsoft glTF LOD Extension Specification](https://github.com/sbtron/glTF/tree/MSFT_lod/extensions/Vendor/MSFT_lod)
-* [PC Mixed Reality Texture Packing Extensions Specification](https://github.com/sbtron/glTF/tree/MSFT_lod/extensions/Vendor/MSFT_packing_occlusionRoughnessMetallic)
-* [Microsoft DDS Textures glTF extensions specification](https://github.com/sbtron/glTF/tree/MSFT_lod/extensions/Vendor/MSFT_texture_dds)
-* [Blender glTF 2.0 exporter](https://github.com/KhronosGroup/glTF-Blender-Exporter)
+* [Microsoft glTF LOD Extension Specification](https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_lod)
+* [PC Mixed Reality Texture Packing Extensions Specification](https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_packing_occlusionRoughnessMetallic)
+* [HoloLens Mixed Reality Texture Packing Extensions Specification](https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_packing_normalRoughnessMetallic)
+* [Microsoft DDS Textures glTF extensions specification](https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds)
+
 
 ## See also
 * [Implementing 3D app launchers](implementing-3d-app-launchers.md)
